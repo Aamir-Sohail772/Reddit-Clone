@@ -1,17 +1,19 @@
-import React, { useState } from "react";
 import { Button, Flex, Icon, Input, Text } from "@chakra-ui/react";
+import React, { useState } from "react";
 import { useSendPasswordResetEmail } from "react-firebase-hooks/auth";
-import { BsDot, BsReddit } from "react-icons/bs";
-import { authModalState } from "../../../atoms/authModalAtom";
-import { auth } from "../../../firebase/clientApp";
 import { useSetRecoilState } from "recoil";
+import { authModelState } from "../../../atoms/authModalAtom";
+import { auth } from "../../../firebase/clientApp";
+import { BsDot, BsReddit } from "react-icons/bs";
 
-// type ResetPasswordProps = {
-//   toggleView: (view: ModalView) => void;
-// };
+/*
+type ResetPasswordProps = {
+    toggleView: (view: ModalView) => void;
+};
+*/
 
 const ResetPassword: React.FC = () => {
-  const setAuthModalState = useSetRecoilState(authModalState);
+  const setAuthModalState = useSetRecoilState(authModelState);
   const [email, setEmail] = useState("");
   const [success, setSuccess] = useState(false);
   const [sendPasswordResetEmail, sending, error] =
@@ -23,6 +25,7 @@ const ResetPassword: React.FC = () => {
     await sendPasswordResetEmail(email);
     setSuccess(true);
   };
+
   return (
     <Flex direction="column" alignItems="center" width="100%">
       <Icon as={BsReddit} color="brand.100" fontSize={40} mb={2} />
@@ -41,7 +44,7 @@ const ResetPassword: React.FC = () => {
             <Input
               required
               name="email"
-              placeholder="email"
+              placeholder="Email..."
               type="email"
               mb={2}
               onChange={(event) => setEmail(event.target.value)}
