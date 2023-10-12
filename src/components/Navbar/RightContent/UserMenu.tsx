@@ -46,6 +46,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ user }) => {
 
   const logout = async () => {
     await signOut(auth);
+    //Clear community state
   };
 
   return (
@@ -90,7 +91,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ user }) => {
         </Flex>
       </MenuButton>
       <MenuList mt={2}>
-        <MenuItem fontSize="10pt" fontWeight="700" closeOnSelect={false}>
+        {/* <MenuItem fontSize="10pt" fontWeight="700" closeOnSelect={false}>
           <Flex gap={2} align="center">
             <Switch
               isChecked={colorMode === "dark" ? true : false}
@@ -98,10 +99,10 @@ const UserMenu: React.FC<UserMenuProps> = ({ user }) => {
             />
             <Text>Dark Mode</Text>
           </Flex>
-        </MenuItem>
+        </MenuItem> */}
         {user ? (
           <>
-            <MenuDivider />
+            {/* <MenuDivider /> */}
             <MenuItem
               fontSize="10px"
               fontWeight={700}
