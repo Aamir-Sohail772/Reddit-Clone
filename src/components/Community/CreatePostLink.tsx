@@ -7,15 +7,15 @@ import { FaReddit } from "react-icons/fa";
 import { IoImageOutline } from "react-icons/io5";
 import { useSetRecoilState } from "recoil";
 
-import { authModalState } from "../../atoms/authModalAtom";
+import { authModelState } from "../../atoms/authModalAtom";
 import { auth } from "../../firebase/clientApp";
-// import useDirectory from "../../hooks/useDirectory";
+import useDirectory from "../../hooks/useDirectory";
 
 const CreatePostLink: React.FC = () => {
   const router = useRouter();
   const [user] = useAuthState(auth);
-//   const { toggleMenuOpen } = useDirectory();
-  const setAuthModelState = useSetRecoilState(authModalState);
+  const { toggleMenuOpen } = useDirectory();
+  const setAuthModelState = useSetRecoilState(authModelState);
   const bg = useColorModeValue("white", "#1A202C");
   const borderColor = useColorModeValue("gray.300", "#2D3748");
   const searchBg = useColorModeValue("gray.50", "#2D3748");
@@ -34,7 +34,7 @@ const CreatePostLink: React.FC = () => {
       return;
     }
 
-    // toggleMenuOpen();
+    toggleMenuOpen();
 
     /*
     if (community) {

@@ -1,39 +1,45 @@
-import React, { useState, useEffect } from "react";
 import { Button, Flex, Input, Text, useColorModeValue } from "@chakra-ui/react";
-import { useSetRecoilState } from "recoil";
-import { authModalState } from "../../../atoms/authModalAtom";
-import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
-import { auth, firestore } from "../../../firebase/clientApp";
-import { FIREBASE_ERRORS } from "../../../firebase/errors";
 import { User } from "firebase/auth";
 import { addDoc, collection } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
+import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
+import { auth,firestore } from "../../../firebase/clientApp";
+import { FIREBASE_ERRORS } from "../../../firebase/errors";
+import { useSetRecoilState } from "recoil";
+import { authModelState } from "../../../atoms/authModalAtom";
+
 
 const SignUp: React.FC = () => {
-  const setAuthModalState = useSetRecoilState(authModalState);
+  const setAuthModalState = useSetRecoilState(authModelState);
   const [signUpForm, setSignUpForm] = useState({
     email: "",
     password: "",
-    confirmPassword: "",
+    conformPassword: "",
   });
   const [error, setError] = useState("");
+  const searchBorder = useColorModeValue("blue.500", "#4A5568");
+  const inputBg = useColorModeValue("gray.50", "#4A5568");
+  const focusedInputBg = useColorModeValue("white", "#2D3748");
+  const placeholderColor = useColorModeValue("gray.500", "#CBD5E0");
+
+  //console.log(signUpForm);
 
   const [createUserWithEmailAndPassword, userCred, loading, userError] =
     useCreateUserWithEmailAndPassword(auth);
 
-  // Firebase logic
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (error) setError("");
 
-    if (signUpForm.password !== signUpForm.confirmPassword) {
+    if (signUpForm.password !== signUpForm.conformPassword) {
       setError("Password Do Not Match");
       return;
     }
-    //passwords match
     createUserWithEmailAndPassword(signUpForm.email, signUpForm.password);
   };
+
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // update form state
+    // update state
     setSignUpForm((prev) => ({
       ...prev,
       [event.target.name]: event.target.value,
@@ -63,19 +69,19 @@ const SignUp: React.FC = () => {
         mb={2}
         onChange={onChange}
         fontSize="10pt"
-        _placeholder={{ color: "gray.500" }}
+        _placeholder={{ color: placeholderColor }}
         _hover={{
-          bg: "white",
+          bg: focusedInputBg,
           border: "1px solid",
-          borderColor: "blue.500",
+          borderColor: searchBorder,
         }}
         _focus={{
           outline: "none",
-          bg: "white",
+          bg: focusedInputBg,
           border: "1px solid",
-          borderColor: "blue.500",
+          borderColor: searchBorder,
         }}
-        bg="gray.50"
+        bg={inputBg}
       />
       <Input
         required
@@ -85,46 +91,56 @@ const SignUp: React.FC = () => {
         mb={2}
         onChange={onChange}
         fontSize="10pt"
-        _placeholder={{ color: "gray.500" }}
+        _placeholder={{ color: placeholderColor }}
         _hover={{
-          bg: "white",
+          bg: focusedInputBg,
           border: "1px solid",
           borderColor: "blue.500",
         }}
         _focus={{
           outline: "none",
-          bg: "white",
+          bg: focusedInputBg,
           border: "1px solid",
-          borderColor: "blue.500",
+          borderColor: searchBorder,
         }}
-        bg="gray.50"
+        bg={inputBg}
       />
+
       <Input
         required
-        name="confirmPassword"
+        name="conformPassword"
         placeholder="Confirm Password..."
         type="password"
         mb={2}
         onChange={onChange}
         fontSize="10pt"
-        _placeholder={{ color: "gray.500" }}
+        _placeholder={{ color: placeholderColor }}
         _hover={{
-          bg: "white",
+          bg: focusedInputBg,
           border: "1px solid",
           borderColor: "blue.500",
         }}
         _focus={{
           outline: "none",
-          bg: "white",
+          bg: focusedInputBg,
           border: "1px solid",
-          borderColor: "blue.500",
+          borderColor: searchBorder,
         }}
-        bg="gray.50"
+        bg={inputBg}
       />
       <Text textAlign="center" color="red" fontSize="10pt">
         {error ||
           FIREBASE_ERRORS[userError?.message as keyof typeof FIREBASE_ERRORS]}
       </Text>
+      {/* {error ||
+        (userError && (
+          <Text textAlign="center" color="red" fontSize="10pt">
+            {error ||
+              FIREBASE_ERRORS[
+                userError.message as keyof typeof FIREBASE_ERRORS
+              ]}
+          </Text>
+        ))} */}
       <Button
         width="100%"
         height="36px"
