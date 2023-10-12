@@ -11,10 +11,9 @@ import { FaReddit } from "react-icons/fa";
 import { GrAdd } from "react-icons/gr";
 import { useRecoilValue } from "recoil";
 
-import { CommunityState } from "../../atoms/CommunitiesAtom";
 import CreateCommunityModel from "../../components/Modal/CreateCommunity/CreateCommunityModel";
 import MenuListItem from "./MenuListItem";
-
+import {CommunityState} from "../../atoms/CommunitiesAtom"
 type CommunitiesProps = {};
 
 const Communities: React.FC<CommunitiesProps> = () => {
