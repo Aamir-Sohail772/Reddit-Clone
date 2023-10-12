@@ -38,7 +38,7 @@ const MenuListItem: React.FC<MenuListItemProps> = ({
     >
       <Flex alignItems="center">
         {imageURL ? (
-          <Image borderRadius="full" boxSize="18px" src={imageURL} mr={2} />
+          <Image borderRadius="full" boxSize="18px" src={imageURL} mr={2} alt="image"/>
         ) : (
           <Icon fontSize={20} mr={2} as={icon} color={iconColor} />
         )}

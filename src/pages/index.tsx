@@ -24,7 +24,10 @@ import PostLoader from "../components/posts/PostLoader";
 import { auth, firestore } from "../firebase/clientApp";
 import useCommunityData from "../hooks/useCommunityData";
 import usePosts from "../hooks/usePosts";
-
+// import CryptoJS from "crypto-js";
+import moment from "moment";
+import Link from "next/link";
+import { useRouter } from "next/router";
 const Home: NextPage = () => {
   const [user, loadingUser] = useAuthState(auth);
   const [loading, setLoading] = useState(false);

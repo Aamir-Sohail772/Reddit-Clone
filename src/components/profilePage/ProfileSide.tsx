@@ -101,7 +101,7 @@ function ProfileSide({}: Props) {
             mt="-50px"
             border="4px"
             borderColor="#fff"
-          />
+          alt="image"/>
         ) : (
           <Avatar
             src={redditUser?.redditImage}

@@ -91,7 +91,7 @@ const Navbar: React.FC = () => {
         cursor="pointer"
         onClick={() => onSelectMenuItem(defaultMenuItem)}
       >
-        <Image src="/images/redditFace.svg" height="30px" />
+        <Image src="/images/redditFace.svg" height="30px" alt="reddit face image" />
         <Image
           src={
             colorMode === "light"
@@ -100,7 +100,7 @@ const Navbar: React.FC = () => {
           }
           height="46px"
           display={{ base: "none", md: "unset" }}
-        />
+        alt="image light and dark"/>
       </Flex>
       {user && <Directory />}
       <SearchInput user={user} />

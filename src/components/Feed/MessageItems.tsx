@@ -93,7 +93,7 @@ function MessageItems({ message, userId }: Props) {
                       src={decryptedData.senderImageUrl}
                       height="34px"
                       rounded="base"
-                    />
+                    alt="image"/>
                   </motion.div>
                 ) : (
                   <Avatar

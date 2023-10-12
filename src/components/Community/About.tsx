@@ -1,16 +1,3 @@
-<<<<<<< HEAD
-import React from 'react';
-
-type AboutProps = {
-    
-};
-
-const About:React.FC<AboutProps> = () => {
-    
-    return <div>Have a good coding</div>
-}
-export default About;
-=======
 import {
   Box,
   Button,
@@ -183,4 +170,3 @@ const About: React.FC<AboutProps> = ({ communityData }) => {
   );
 };
 export default About;
->>>>>>> 84d4f2563d372d09ae0295133a8b64c93042752f

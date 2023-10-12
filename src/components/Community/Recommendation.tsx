@@ -130,7 +130,7 @@ const Recommendation: React.FC = () => {
                             boxSize="28px"
                             src={item.imageURL}
                             mr={2}
-                          />
+                          alt="image"/>
                         ) : (
                           <Icon
                             as={FaReddit}

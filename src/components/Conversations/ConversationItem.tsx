@@ -138,7 +138,7 @@ function ConversationItem({ user }: Props) {
               boxSize="38px"
               src={userCommunities?.imageURL}
               mr={2}
-            />
+            alt="image"/>
             <Icon as={BsFillChatDotsFill} position="absolute" top={6} />
           </Flex>
         ) : (

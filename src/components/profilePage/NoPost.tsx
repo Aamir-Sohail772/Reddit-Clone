@@ -10,7 +10,7 @@ function NoPost({}: Props) {
         <Image
           src="https://drive.google.com/uc?export=download&id=1oS2QPa8ex6ufQvTG3mZ51Gm-LSWSb2SQ"
           height="200px"
-        />
+        alt="image"/>
         <Text
           fontSize="20pt"
           color="gray.500"

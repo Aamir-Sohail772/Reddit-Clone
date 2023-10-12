@@ -29,7 +29,7 @@ import {
 
 import { Post } from "../../atoms/PostAtom";
 
-// const secretPass = process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS;
+const secretPass = process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS;
 
 type PostItemProps = {
   post: Post;
@@ -111,24 +111,24 @@ const PostItem: React.FC<PostItemProps> = ({
       arrName.push("title", "creatorDisplayName", "imageURL");
     }
 
-    // try {
-    //   for (let index = 0; index < arr.length; index++) {
-    //     if (arr[index]) {
-    //       const bytes = CryptoJS.AES.decrypt(
-    //         arr[index]!,
-    //         process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS as string
-    //       );
-    //       const data = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    try {
+      for (let index = 0; index < arr.length; index++) {
+        if (arr[index]) {
+          const bytes = CryptoJS.AES.decrypt(
+            arr[index]!,
+            process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS as string
+          );
+          const data = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 
-    //       setDecryptedData((prev) => ({
-    //         ...prev,
-    //         [arrName[index]]: data,
-    //       }));
-    //     } else return;
-    //   }
-    // } catch (error) {
-    //   console.log(error);
-    // }
+          setDecryptedData((prev) => ({
+            ...prev,
+            [arrName[index]]: data,
+          }));
+        } else return;
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }, [post]);
 
   return (
