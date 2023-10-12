@@ -10,7 +10,7 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-// import CryptoJS from "crypto-js";
+import CryptoJS from "crypto-js";
 import moment from "moment";
 import Link from "next/link";
 import { useRouter } from "next/router";

@@ -93,17 +93,14 @@ import {
         JSON.stringify(splitName),
         process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS as string
       ).toString();
-  
+      
       const newPost: Post = {
         communityId: communityId as string,
         creatorId: user.uid,
         communityImageURL: communityImageURL || "",
         creatorDisplayName: dataName,
-        // creatorDisplayName: user.email!.split("@")[0],
         title: encryptedData.title,
-        // title: textInput.title,
         body: encryptedData.body,
-        // body: textInput.body,
         numberOfComments: 0,
         voteStatus: 0,
         createdAt: serverTimestamp() as Timestamp,
@@ -125,7 +122,6 @@ import {
   
           await updateDoc(postDocRef, {
             imageURL: encryptDownloadURL,
-            // imageURL: downloadURL,
           });
         }
         router.back();
