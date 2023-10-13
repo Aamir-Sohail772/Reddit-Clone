@@ -218,7 +218,7 @@ Install dependencies
 Clone the project
 
 ```bash
-  git clone https://github.com/jeffjiang13/Reddit-Clone.git
+  git clone https://github.com/Aamir-Sohail77/Reddit-Clone.git
 ```
 
 change directory
