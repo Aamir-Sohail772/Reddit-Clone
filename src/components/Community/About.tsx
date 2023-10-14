@@ -17,13 +17,12 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { RiCakeLine } from "react-icons/ri";
 import { FaReddit } from "react-icons/fa";
-import { Community, communityState } from "../../atoms/communitiesAtom";
 import { auth, firestore, storage } from "../../firebase/clientApp";
 import useSelectFile from "../../hooks/useSelectFile";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import { doc, updateDoc } from "firebase/firestore";
 import { useSetRecoilState } from "recoil";
-
+import { Community, CommunityState } from "../../atoms/communitiesAtom";
 type AboutProps = {
   communityData: Community;
 };
@@ -33,7 +32,7 @@ const About: React.FC<AboutProps> = ({ communityData }) => {
   const selectedFileRef = useRef<HTMLInputElement>(null);
   const { selectedFile, setSelectedFile, onSelectFile } = useSelectFile();
   const [uploadingImage, setUploadingImage] = useState(false);
-  const setCommunityStateValue = useSetRecoilState(communityState);
+  const setCommunityStateValue = useSetRecoilState(CommunityState);
 
   const onUpdateImage = async () => {
     if (!selectedFile) return;

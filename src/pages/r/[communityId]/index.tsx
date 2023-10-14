@@ -1,7 +1,7 @@
 import { doc, getDoc } from "firebase/firestore";
 import { GetServerSidePropsContext } from "next";
 import React, { useEffect } from "react";
-import { Community, communityState } from "../../../atoms/communitiesAtom";
+import { Community, communityState } from "../../../atoms/CommunitiesAtom";
 import { firestore } from "../../../firebase/clientApp";
 import safeJsonStringify from "safe-json-stringify";
 import NotFound from "../../../components/Community/NotFound";

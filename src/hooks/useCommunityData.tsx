@@ -15,7 +15,7 @@ import {
   Community,
   CommunitySnippet,
   communityState,
-} from "../atoms/communitiesAtom";
+} from "../atoms/CommunitiesAtom";
 import { auth, firestore } from "../firebase/clientApp";
 
 const useCommunityData = () => {

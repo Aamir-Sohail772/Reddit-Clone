@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { FaReddit } from "react-icons/fa";
 import { useRecoilState } from "recoil";
-import { communityState } from "../atoms/communitiesAtom";
+import { communityState } from "../atoms/CommunitiesAtom";
 import {
   defaultMenuItem,
   DirectoryMenuItem,
