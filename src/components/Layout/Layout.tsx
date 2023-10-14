@@ -1,9 +1,9 @@
-import React from "react";
-import Navbar from "../../Navbar/Navbar";
+import React, { ReactNode } from "react";
+import Navbar from "../Navbar/Navbar";
 
-type LayoutProps = {
-  children: any;
-};
+interface LayoutProps {
+  children: ReactNode;
+}
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
@@ -13,5 +13,4 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     </>
   );
 };
-
 export default Layout;

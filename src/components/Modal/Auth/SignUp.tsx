@@ -1,45 +1,38 @@
-import { Button, Flex, Input, Text, useColorModeValue } from "@chakra-ui/react";
-import { User } from "firebase/auth";
-import { addDoc, collection } from "firebase/firestore";
+import { Input, Button, Flex, Text } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
-import { auth,firestore } from "../../../firebase/clientApp";
-import { FIREBASE_ERRORS } from "../../../firebase/errors";
 import { useSetRecoilState } from "recoil";
-import { authModelState } from "../../../atoms/authModalAtom";
-
+import { authModalState } from "../../../atoms/authModalAtom";
+import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
+import { auth, firestore } from "../../../firebase/clientApp";
+import { FIREBASE_ERRORS } from "../../../firebase/errors";
+import { User } from "firebase/auth";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 
 const SignUp: React.FC = () => {
-  const setAuthModalState = useSetRecoilState(authModelState);
+  const setAuthModalState = useSetRecoilState(authModalState);
   const [signUpForm, setSignUpForm] = useState({
     email: "",
     password: "",
-    conformPassword: "",
+    confirmPassword: "",
   });
   const [error, setError] = useState("");
-  const searchBorder = useColorModeValue("blue.500", "#4A5568");
-  const inputBg = useColorModeValue("gray.50", "#4A5568");
-  const focusedInputBg = useColorModeValue("white", "#2D3748");
-  const placeholderColor = useColorModeValue("gray.500", "#CBD5E0");
-
-  //console.log(signUpForm);
-
   const [createUserWithEmailAndPassword, userCred, loading, userError] =
     useCreateUserWithEmailAndPassword(auth);
 
+  // Firebase logic
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (error) setError("");
-
-    if (signUpForm.password !== signUpForm.conformPassword) {
-      setError("Password Do Not Match");
+    if (signUpForm.password !== signUpForm.confirmPassword) {
+      setError("Passwords do not match");
       return;
     }
+    // passwords match
     createUserWithEmailAndPassword(signUpForm.email, signUpForm.password);
   };
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // update state
+    // update form state
     setSignUpForm((prev) => ({
       ...prev,
       [event.target.name]: event.target.value,
@@ -47,8 +40,8 @@ const SignUp: React.FC = () => {
   };
 
   const createUserDocument = async (user: User) => {
-    await addDoc(
-      collection(firestore, "users"),
+    await setDoc(
+      doc(firestore, "users", user.uid),
       JSON.parse(JSON.stringify(user))
     );
   };
@@ -64,83 +57,73 @@ const SignUp: React.FC = () => {
       <Input
         required
         name="email"
-        placeholder="Email..."
+        placeholder="email"
         type="email"
         mb={2}
         onChange={onChange}
         fontSize="10pt"
-        _placeholder={{ color: placeholderColor }}
+        _placeholder={{ color: "gray.500" }}
         _hover={{
-          bg: focusedInputBg,
+          bg: "white",
           border: "1px solid",
-          borderColor: searchBorder,
+          borderColor: "blue.500",
         }}
         _focus={{
           outline: "none",
-          bg: focusedInputBg,
+          bg: "white",
           border: "1px solid",
-          borderColor: searchBorder,
+          borderColor: "blue.500",
         }}
-        bg={inputBg}
+        bg="gray.50"
       />
       <Input
         required
         name="password"
-        placeholder="Password..."
+        onChange={onChange}
+        placeholder="password"
         type="password"
         mb={2}
-        onChange={onChange}
         fontSize="10pt"
-        _placeholder={{ color: placeholderColor }}
+        _placeholder={{ color: "gray.500" }}
         _hover={{
-          bg: focusedInputBg,
+          bg: "white",
           border: "1px solid",
           borderColor: "blue.500",
         }}
         _focus={{
           outline: "none",
-          bg: focusedInputBg,
+          bg: "white",
           border: "1px solid",
-          borderColor: searchBorder,
+          borderColor: "blue.500",
         }}
-        bg={inputBg}
+        bg="gray.50"
       />
-
       <Input
         required
-        name="conformPassword"
-        placeholder="Confirm Password..."
+        name="confirmPassword"
+        onChange={onChange}
+        placeholder="confirm password"
         type="password"
         mb={2}
-        onChange={onChange}
         fontSize="10pt"
-        _placeholder={{ color: placeholderColor }}
+        _placeholder={{ color: "gray.500" }}
         _hover={{
-          bg: focusedInputBg,
+          bg: "white",
           border: "1px solid",
           borderColor: "blue.500",
         }}
         _focus={{
           outline: "none",
-          bg: focusedInputBg,
+          bg: "white",
           border: "1px solid",
-          borderColor: searchBorder,
+          borderColor: "blue.500",
         }}
-        bg={inputBg}
+        bg="gray.50"
       />
       <Text textAlign="center" color="red" fontSize="10pt">
         {error ||
           FIREBASE_ERRORS[userError?.message as keyof typeof FIREBASE_ERRORS]}
       </Text>
-      {/* {error ||
-        (userError && (
-          <Text textAlign="center" color="red" fontSize="10pt">
-            {error ||
-              FIREBASE_ERRORS[
-                userError.message as keyof typeof FIREBASE_ERRORS
-              ]}
-          </Text>
-        ))} */}
       <Button
         width="100%"
         height="36px"
@@ -164,7 +147,7 @@ const SignUp: React.FC = () => {
             }))
           }
         >
-          Log In
+          LOG IN
         </Text>
       </Flex>
     </form>

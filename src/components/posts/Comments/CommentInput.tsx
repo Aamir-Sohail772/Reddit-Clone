@@ -1,20 +1,14 @@
-import {
-  Flex,
-  Textarea,
-  Button,
-  Text,
-  useColorModeValue,
-} from "@chakra-ui/react";
+import { Flex, Textarea, Button, Text } from "@chakra-ui/react";
 import { User } from "firebase/auth";
 import React from "react";
-import AuthButtons from "../../../Navbar/RightContent/AuthButtons";
+import AuthButtons from "../../Navbar/RightContent/AuthButtons";
 
 type CommentInputProps = {
   commentText: string;
   setCommentText: (value: string) => void;
   user: User;
   createLoading: boolean;
-  onCreateComments: (commentText: string) => void;
+  onCreateComment: (commentText: string) => void;
 };
 
 const CommentInput: React.FC<CommentInputProps> = ({
@@ -22,10 +16,8 @@ const CommentInput: React.FC<CommentInputProps> = ({
   setCommentText,
   user,
   createLoading,
-  onCreateComments,
+  onCreateComment,
 }) => {
-  const bg = useColorModeValue("white", "#1A202C");
-  const bgBottom = useColorModeValue("gray.100", "#1A202C");
   return (
     <Flex direction="column" position="relative">
       {user ? (
@@ -47,7 +39,7 @@ const CommentInput: React.FC<CommentInputProps> = ({
             _placeholder={{ color: "gray.500" }}
             _focus={{
               outline: "none",
-              bg: bg,
+              bg: "white",
               border: "1px solid black",
             }}
           />
@@ -57,7 +49,7 @@ const CommentInput: React.FC<CommentInputProps> = ({
             right={0.1}
             bottom="1px"
             justify="flex-end"
-            bg={bgBottom}
+            bg="gray.100"
             p="6px 8px"
             borderRadius="0px 0px 4px 4px"
           >
@@ -65,7 +57,7 @@ const CommentInput: React.FC<CommentInputProps> = ({
               height="26px"
               disabled={!commentText.length}
               isLoading={createLoading}
-              onClick={() => onCreateComments(commentText)}
+              onClick={() => onCreateComment(commentText)}
             >
               Comment
             </Button>

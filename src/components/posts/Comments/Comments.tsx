@@ -5,14 +5,11 @@ import {
   SkeletonText,
   Stack,
   Text,
-  useColorModeValue,
 } from "@chakra-ui/react";
-import CryptoJS from "crypto-js";
 import { User } from "firebase/auth";
 import {
   collection,
   doc,
-  getDoc,
   getDocs,
   increment,
   orderBy,
@@ -24,20 +21,10 @@ import {
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { useSetRecoilState } from "recoil";
-
-import { Post, postState } from "../../../atoms/PostAtom";
+import { Post, postState } from "../../../atoms/postsAtom";
 import { firestore } from "../../../firebase/clientApp";
 import CommentInput from "./CommentInput";
 import CommentItem, { Comment } from "./CommentItem";
-
-interface RedditUserDocument {
-  userId?: string;
-  userName: string;
-  userEmail?: string;
-  userImage: string;
-  redditImage: string;
-  timestamp: Timestamp;
-}
 
 type CommentsProps = {
   user: User;
@@ -51,57 +38,28 @@ const Comments: React.FC<CommentsProps> = ({
   communityId,
 }) => {
   const [commentText, setCommentText] = useState("");
-  const [encryptedData, setEncryptedData] = useState("");
   const [comments, setComments] = useState<Comment[]>([]);
-  const [loadingDeleteId, setLoadingDeleteId] = useState("");
   const [fetchLoading, setFetchLoading] = useState(true);
   const [createLoading, setCreateLoading] = useState(false);
-  const [redditUser, setRedditUser] = useState<RedditUserDocument>();
+  const [loadingDeleteId, setLoadingDeleteId] = useState("");
   const setPostState = useSetRecoilState(postState);
-  const bg = useColorModeValue("white", "#1A202C");
-  const lineBorderColor = useColorModeValue("gray.100", "#171923");
 
-  //console.log(comments);
-
-  const fetchRedditUser = async (userId: any) => {
-    if (!userId) return;
-
+  const onCreateComment = async () => {
+    setCreateLoading(true);
     try {
-      const docRef = doc(firestore, "redditUser", userId);
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        setRedditUser(docSnap.data() as RedditUserDocument);
-      } else return;
-    } catch (error: any) {
-      console.log(error.message);
-    }
-  };
-
-  const onCreateComments = async () => {
-    try {
-      setCreateLoading(true);
-
-      const splitName = user.email!.split("@")[0];
-
-      const dataName = CryptoJS.AES.encrypt(
-        JSON.stringify(splitName),
-        process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS as string
-      ).toString();
-
       const batch = writeBatch(firestore);
 
+      // create a comment document
       const commentDocRef = doc(collection(firestore, "comments"));
 
       const newComment: Comment = {
         id: commentDocRef.id,
         creatorId: user.uid,
-        creatorDisplayText: dataName,
-        creatorPhotoURL: redditUser?.redditImage!,
+        creatorDisplayText: user.email!.split("@")[0],
         communityId,
         postId: selectedPost?.id!,
         postTitle: selectedPost?.title!,
-        text: encryptedData,
+        text: commentText,
         createdAt: serverTimestamp() as Timestamp,
       };
 
@@ -109,6 +67,7 @@ const Comments: React.FC<CommentsProps> = ({
 
       newComment.createdAt = { seconds: Date.now() / 1000 } as Timestamp;
 
+      // update post numberOfComments +1
       const postDocRef = doc(firestore, "posts", selectedPost?.id!);
       batch.update(postDocRef, {
         numberOfComments: increment(1),
@@ -116,6 +75,7 @@ const Comments: React.FC<CommentsProps> = ({
 
       await batch.commit();
 
+      // update client recoil state
       setCommentText("");
       setComments((prev) => [newComment, ...prev]);
       setPostState((prev) => ({
@@ -126,20 +86,21 @@ const Comments: React.FC<CommentsProps> = ({
         } as Post,
       }));
     } catch (error) {
-      console.log("📝", error);
+      console.log("onCreateComment error", error);
     }
     setCreateLoading(false);
   };
 
   const onDeleteComment = async (comment: Comment) => {
-    setLoadingDeleteId(comment.id!);
+    setLoadingDeleteId(comment.id);
     try {
       const batch = writeBatch(firestore);
 
       // delete comment document
-      const commentDocRef = doc(firestore, "comments", comment.id!);
+      const commentDocRef = doc(firestore, "comments", comment.id);
       batch.delete(commentDocRef);
 
+      // update post numberOfComments -1
       const postDocRef = doc(firestore, "posts", selectedPost?.id!);
       batch.update(postDocRef, {
         numberOfComments: increment(-1),
@@ -147,6 +108,7 @@ const Comments: React.FC<CommentsProps> = ({
 
       await batch.commit();
 
+      // update client recoil state
       setPostState((prev) => ({
         ...prev,
         selectedPost: {
@@ -157,7 +119,7 @@ const Comments: React.FC<CommentsProps> = ({
 
       setComments((prev) => prev.filter((item) => item.id !== comment.id));
     } catch (error) {
-      console.log("CommentDelete Error", error);
+      console.log("onDeleteComment error", error);
     }
     setLoadingDeleteId("");
   };
@@ -169,16 +131,14 @@ const Comments: React.FC<CommentsProps> = ({
         where("postId", "==", selectedPost?.id),
         orderBy("createdAt", "desc")
       );
-      const commentsDocs = await getDocs(commentsQuery);
-
-      const comments = commentsDocs.docs.map((doc) => ({
+      const commentDocs = await getDocs(commentsQuery);
+      const comments = commentDocs.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
-
       setComments(comments as Comment[]);
     } catch (error) {
-      console.log("GetPostComments Error", error);
+      console.log("getPostComments error", error);
     }
     setFetchLoading(false);
   };
@@ -188,25 +148,8 @@ const Comments: React.FC<CommentsProps> = ({
     getPostComments();
   }, [selectedPost]);
 
-  useEffect(() => {
-    try {
-      const data = CryptoJS.AES.encrypt(
-        JSON.stringify(commentText),
-        process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS as string
-      ).toString();
-
-      setEncryptedData(data);
-    } catch (error) {
-      console.log(error);
-    }
-  }, [commentText]);
-
-  useEffect(() => {
-    fetchRedditUser(user?.uid);
-  }, [user]);
-
   return (
-    <Box bg={bg} borderRadius="0px 0px 4px 4px" p={2}>
+    <Box bg="white" borderRadius="0px 0px 4px 4px" p={2}>
       <Flex
         direction="column"
         pl={10}
@@ -221,7 +164,7 @@ const Comments: React.FC<CommentsProps> = ({
             setCommentText={setCommentText}
             user={user}
             createLoading={createLoading}
-            onCreateComments={onCreateComments}
+            onCreateComment={onCreateComment}
           />
         )}
       </Flex>
@@ -229,7 +172,7 @@ const Comments: React.FC<CommentsProps> = ({
         {fetchLoading ? (
           <>
             {[0, 1, 2].map((item) => (
-              <Box key={item} padding="6" bg={bg}>
+              <Box key={item} padding="6" bg="white">
                 <SkeletonCircle size="10" />
                 <SkeletonText mt="4" noOfLines={2} spacing="4" />
               </Box>
@@ -243,7 +186,7 @@ const Comments: React.FC<CommentsProps> = ({
                 justify="center"
                 align="center"
                 borderTop="1px solid"
-                borderColor={lineBorderColor}
+                borderColor="gray.100"
                 p={20}
               >
                 <Text fontWeight={700} opacity={0.3}>
@@ -257,8 +200,8 @@ const Comments: React.FC<CommentsProps> = ({
                     key={comment.id}
                     comment={comment}
                     onDeleteComment={onDeleteComment}
-                    isLoading={loadingDeleteId === comment.id!}
-                    userId={user?.uid}
+                    loadingDelete={loadingDeleteId === comment.id}
+                    userId={user.uid}
                   />
                 ))}
               </>

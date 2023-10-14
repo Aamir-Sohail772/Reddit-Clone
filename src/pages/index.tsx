@@ -7,89 +7,83 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { motion } from "framer-motion";
 import type { NextPage } from "next";
-import Head from "next/head";
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-
-import { Post, PostVote } from "../atoms/PostAtom";
+import { Post, PostVote } from "../atoms/postsAtom";
 import CreatePostLink from "../components/Community/CreatePostLink";
 import PersonalHome from "../components/Community/PersonalHome";
 import Premium from "../components/Community/Premium";
-import Recommendation from "../components/Community/Recommendation";
+import Recommendations from "../components/Community/Recommendations";
 import PageContent from "../components/Layout/PageContent";
-import PostItem from "../components/posts/PostItem";
-import PostLoader from "../components/posts/PostLoader";
+import PostItem from "../components/Posts/PostItem";
+import PostLoader from "../components/Posts/PostLoader";
 import { auth, firestore } from "../firebase/clientApp";
 import useCommunityData from "../hooks/useCommunityData";
 import usePosts from "../hooks/usePosts";
-// import CryptoJS from "crypto-js";
-import moment from "moment";
-import Link from "next/link";
-import { useRouter } from "next/router";
+
 const Home: NextPage = () => {
   const [user, loadingUser] = useAuthState(auth);
   const [loading, setLoading] = useState(false);
   const {
     postStateValue,
     setPostStateValue,
-    onDeletePost,
     onSelectPost,
+    onDeletePost,
     onVote,
   } = usePosts();
   const { communityStateValue } = useCommunityData();
 
-  //const communityStateValue = useRecoilValue(CommunityState);
-
   const buildUserHomeFeed = async () => {
+    setLoading(true);
     try {
       if (communityStateValue.mySnippets.length) {
+        // get posts from users' communities
         const myCommunityIds = communityStateValue.mySnippets.map(
           (snippet) => snippet.communityId
         );
-
         const postQuery = query(
           collection(firestore, "posts"),
           where("communityId", "in", myCommunityIds),
           limit(10)
         );
-
-        const postDoc = await getDocs(postQuery);
-        const posts = postDoc.docs.map((doc) => ({
+        const postDocs = await getDocs(postQuery);
+        const posts = postDocs.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-
         setPostStateValue((prev) => ({
           ...prev,
           posts: posts as Post[],
         }));
       } else {
-        buildUserHomeFeed();
+        buildNoUserHomeFeed();
       }
     } catch (error) {
-      console.log("Building HHome Error", error);
+      console.log("buildUserHomeFeed error", error);
     }
+    setLoading(false);
   };
+
   const buildNoUserHomeFeed = async () => {
     setLoading(true);
     try {
       const postQuery = query(
         collection(firestore, "posts"),
-        orderBy("voteStatus", "desc")
-        //limit(10)
+        orderBy("voteStatus", "desc"),
+        limit(10)
       );
 
       const postDocs = await getDocs(postQuery);
       const posts = postDocs.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-
       setPostStateValue((prev) => ({
         ...prev,
         posts: posts as Post[],
       }));
+
+      // setPostState
     } catch (error) {
-      console.log("BuildNoUserHome", error);
+      console.log("buildNoUserHomeFeed error", error);
     }
     setLoading(false);
   };
@@ -97,37 +91,28 @@ const Home: NextPage = () => {
   const getUserPostVotes = async () => {
     try {
       const postIds = postStateValue.posts.map((post) => post.id);
-
-      const batches: PostVote[] | any[][] = [];
-
-      while (postIds.length) {
-        const batch = postIds.splice(0, 10);
-
-        const postVotesQuery = query(
-          collection(firestore, `users/${user?.uid}/postVotes`),
-          where("postId", "in", [...batch])
-        );
-        const postVoteDoc = await getDocs(postVotesQuery);
-
-        const postVotes = postVoteDoc.docs.map((doc: any) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        batches.push(postVotes as any);
-      }
+      const postVotesQuery = query(
+        collection(firestore, `users/${user?.uid}/postVotes`),
+        where("postId", "in", postIds)
+      );
+      const postVoteDocs = await getDocs(postVotesQuery);
+      const postVotes = postVoteDocs.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
 
       setPostStateValue((prev) => ({
         ...prev,
-        postVotes: batches.flat() as PostVote[],
+        postVotes: postVotes as PostVote[],
       }));
     } catch (error) {
-      console.log("getUserPostVotes Error", error);
+      console.log("getUserPostVotes error", error);
     }
   };
 
+  // useEffects
   useEffect(() => {
-    if (communityStateValue.snippetsFetched) buildNoUserHomeFeed();
+    if (communityStateValue.snippetsFetched) buildUserHomeFeed();
   }, [communityStateValue.snippetsFetched]);
 
   useEffect(() => {
@@ -146,49 +131,38 @@ const Home: NextPage = () => {
   }, [user, postStateValue.posts]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true }}
-    >
-      <Head>
-        <title>Reddit Clone</title>
-        <meta name="description" content="Generated by create next app" />
-        <link rel="icon" href="/images/header.png" />
-      </Head>
-      <PageContent>
-        <>
-          <CreatePostLink />
-          {loading ? (
-            <PostLoader />
-          ) : (
-            <Stack>
-              {postStateValue.posts.map((post) => (
-                <PostItem
-                  key={post.id}
-                  post={post}
-                  onVote={onVote}
-                  onDeletePost={onDeletePost}
-                  userVoteValue={
-                    postStateValue.postVotes.find(
-                      (item) => item.postId === post.id
-                    )?.voteValue
-                  }
-                  userIsCreator={user?.uid === post.creatorId}
-                  onSelectPost={onSelectPost}
-                  homePage
-                />
-              ))}
-            </Stack>
-          )}
-        </>
-        <Stack spacing={5}>
-          <Recommendation />
-          <Premium />
-          <PersonalHome />
-        </Stack>
-      </PageContent>
-    </motion.div>
+    <PageContent>
+      <>
+        <CreatePostLink />
+        {loading ? (
+          <PostLoader />
+        ) : (
+          <Stack>
+            {postStateValue.posts.map((post) => (
+              <PostItem
+                key={post.id}
+                post={post}
+                onSelectPost={onSelectPost}
+                onDeletePost={onDeletePost}
+                onVote={onVote}
+                userVoteValue={
+                  postStateValue.postVotes.find(
+                    (item) => item.postId === post.id
+                  )?.voteValue
+                }
+                userIsCreator={user?.uid === post.creatorId}
+                homePage
+              />
+            ))}
+          </Stack>
+        )}
+      </>
+      <Stack spacing={5}>
+        <Recommendations />
+        <Premium />
+        <PersonalHome />
+      </Stack>
+    </PageContent>
   );
 };
 

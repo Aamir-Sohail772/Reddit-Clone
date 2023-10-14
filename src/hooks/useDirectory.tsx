@@ -1,25 +1,26 @@
 import { useRouter } from "next/router";
-import React, { useEffect } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { CommunityState } from "../atoms/CommunitiesAtom";
+import { useEffect } from "react";
+import { FaReddit } from "react-icons/fa";
+import { useRecoilState } from "recoil";
+import { communityState } from "../atoms/communitiesAtom";
 import {
+  defaultMenuItem,
   DirectoryMenuItem,
   directoryMenuState,
 } from "../atoms/directoryMenuAtom";
-import { FaReddit } from "react-icons/fa";
 
 const useDirectory = () => {
   const [directoryState, setDirectoryState] =
     useRecoilState(directoryMenuState);
   const router = useRouter();
-  const communityStateValue = useRecoilValue(CommunityState);
+  const [communityStateValue, setCommunityStateValue] =
+    useRecoilState(communityState);
 
   const onSelectMenuItem = (menuItem: DirectoryMenuItem) => {
     setDirectoryState((prev) => ({
       ...prev,
       selectedMenuItem: menuItem,
     }));
-
     router.push(menuItem.link);
     if (directoryState.isOpen) {
       toggleMenuOpen();
@@ -47,8 +48,24 @@ const useDirectory = () => {
           iconColor: "blue.500",
         },
       }));
+      return;
     }
+    setDirectoryState((prev) => ({
+      ...prev,
+      selectedMenuItem: defaultMenuItem,
+    }));
   }, [communityStateValue.currentCommunity]);
+
+  useEffect(() => {
+    const { communityId } = router.query;
+
+    if (!communityId) {
+      setCommunityStateValue((prev) => ({
+        ...prev,
+        currentCommunity: undefined,
+      }));
+    }
+  }, [router.query]);
 
   return { directoryState, toggleMenuOpen, onSelectMenuItem };
 };

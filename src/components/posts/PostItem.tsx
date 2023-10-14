@@ -1,20 +1,5 @@
-import {
-  Alert,
-  AlertIcon,
-  Flex,
-  Icon,
-  Image,
-  Skeleton,
-  Spinner,
-  Stack,
-  Text,
-  useColorModeValue,
-} from "@chakra-ui/react";
-import CryptoJS from "crypto-js";
-import moment from "moment";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { Post } from "../../atoms/postsAtom";
 import { AiOutlineDelete } from "react-icons/ai";
 import { BsChat, BsDot } from "react-icons/bs";
 import { FaReddit } from "react-icons/fa";
@@ -26,17 +11,27 @@ import {
   IoArrowUpCircleSharp,
   IoBookmarkOutline,
 } from "react-icons/io5";
-
-import { Post } from "../../atoms/PostAtom";
-
-const secretPass = process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS;
+import {
+  Alert,
+  AlertIcon,
+  Flex,
+  Icon,
+  Image,
+  Skeleton,
+  Spinner,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import moment from "moment";
+import { useRouter } from "next/router";
+import Link from "next/link";
 
 type PostItemProps = {
   post: Post;
   userIsCreator: boolean;
   userVoteValue?: number;
   onVote: (
-    event: React.MouseEvent<Element, MouseEvent>,
+    event: React.MouseEvent<SVGElement, MouseEvent>,
     post: Post,
     vote: number,
     communityId: string
@@ -57,24 +52,10 @@ const PostItem: React.FC<PostItemProps> = ({
 }) => {
   const [loadingImage, setLoadingImage] = useState(true);
   const [loadingDelete, setLoadingDelete] = useState(false);
-  const [error, setError] = useState(false);
-  const [decryptedData, setDecryptedData] = useState({
-    title: "",
-    body: "",
-    creatorDisplayName: "",
-    imageURL: "",
-  });
-  const singlePostPage = !onSelectPost;
   const router = useRouter();
+  const singlePostPage = !onSelectPost;
 
-  // Thames
-  const bg = useColorModeValue("white", "#1A202C");
-  const borderColor = useColorModeValue("gray.300", "#2D3748");
-  const singlePageBorderColor = useColorModeValue("white", "#2D3748");
-  const voteLineBorderColor = useColorModeValue("gray.100", "#171923");
-  const IconHoverBg = useColorModeValue("gray.200", "#2A4365");
-  const IconBg = useColorModeValue("none", "#A0AEC0");
-  const voteIconBg = useColorModeValue("gray.400", "#CBD5E0");
+  const [error, setError] = useState(false);
 
   const handleDelete = async (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
@@ -85,11 +66,10 @@ const PostItem: React.FC<PostItemProps> = ({
       const success = await onDeletePost(post);
 
       if (!success) {
-        throw new Error("Failed to Delete Post");
+        throw new Error("Failed to delete post");
       }
 
-      console.log("Post was Successfully Deleted");
-
+      console.log("Post was successfully deleted");
       if (singlePostPage) {
         router.push(`/r/${post.communityId}`);
       }
@@ -99,52 +79,20 @@ const PostItem: React.FC<PostItemProps> = ({
     setLoadingDelete(false);
   };
 
-  useEffect(() => {
-    const arr = [];
-    const arrName: string[] = [];
-
-    if (post.body) {
-      arr.push(post.title, post.body, post.creatorDisplayName, post.imageURL);
-      arrName.push("title", "body", "creatorDisplayName", "imageURL");
-    } else {
-      arr.push(post.title, post.creatorDisplayName, post.imageURL);
-      arrName.push("title", "creatorDisplayName", "imageURL");
-    }
-
-    try {
-      for (let index = 0; index < arr.length; index++) {
-        if (arr[index]) {
-          const bytes = CryptoJS.AES.decrypt(
-            arr[index]!,
-            process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS as string
-          );
-          const data = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-
-          setDecryptedData((prev) => ({
-            ...prev,
-            [arrName[index]]: data,
-          }));
-        } else return;
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }, [post]);
-
   return (
     <Flex
       border="1px solid"
-      bg={bg}
-      borderColor={singlePostPage ? singlePageBorderColor : borderColor}
+      bg="white"
+      borderColor={singlePostPage ? "white" : "gray.300"}
       borderRadius={singlePostPage ? "4px 4px 0px 0px" : "4px"}
-      _hover={{ borderColor: singlePostPage ? "none" : borderColor }}
-      cursor={singlePostPage ? "unset" : "pointer"}
+      _hover={{ borderColor: singlePostPage ? "none" : "gray.500" }}
+      cursor={singlePostPage ? "unset" : "pointer "}
       onClick={() => onSelectPost && onSelectPost(post)}
     >
       <Flex
         direction="column"
         align="center"
-        bg={singlePostPage ? "none" : voteLineBorderColor}
+        bg={singlePostPage ? "none" : "gray.100"}
         p={2}
         width="40px"
         borderRadius={singlePostPage ? "0" : "3px 0px 0px 3px"}
@@ -153,21 +101,19 @@ const PostItem: React.FC<PostItemProps> = ({
           as={
             userVoteValue === 1 ? IoArrowUpCircleSharp : IoArrowUpCircleOutline
           }
-          color={userVoteValue === 1 ? "brand.100" : voteIconBg}
+          color={userVoteValue === 1 ? "brand.100" : "gray.400"}
           fontSize={22}
           onClick={(event) => onVote(event, post, 1, post.communityId)}
           cursor="pointer"
         />
-        <Text fontSize="9pt" color={voteIconBg}>
-          {post.voteStatus}
-        </Text>
+        <Text fontSize="9pt">{post.voteStatus}</Text>
         <Icon
           as={
             userVoteValue === -1
               ? IoArrowDownCircleSharp
               : IoArrowDownCircleOutline
           }
-          color={userVoteValue === -1 ? "#4379ff" : voteIconBg}
+          color={userVoteValue === -1 ? "#4379ff" : "gray.400"}
           fontSize={22}
           onClick={(event) => onVote(event, post, -1, post.communityId)}
           cursor="pointer"
@@ -181,8 +127,8 @@ const PostItem: React.FC<PostItemProps> = ({
           </Alert>
         )}
         <Stack spacing={1} p="10px">
-          <Stack direction="row" spacing={0.5} align="center" fontSize="9pt">
-            {/* check */}
+          <Stack direction="row" spacing={0.6} align="center" fontSize="9pt">
+            {/* Home Page Check */}
             {homePage && (
               <>
                 {post.communityImageURL ? (
@@ -191,36 +137,36 @@ const PostItem: React.FC<PostItemProps> = ({
                     borderRadius="full"
                     boxSize="18px"
                     mr={2}
-                  alt="community image"/>
+                  />
                 ) : (
-                  <Icon as={FaReddit} fontSize="18px" color="blue.500" />
+                  <Icon as={FaReddit} fontSize="18pt" mr={1} color="blue.500" />
                 )}
                 <Link href={`r/${post.communityId}`}>
                   <Text
                     fontWeight={700}
                     _hover={{ textDecoration: "underline" }}
-                    onClick={(event) => event.stopPropagation}
+                    onClick={(event) => event.stopPropagation()}
                   >{`r/${post.communityId}`}</Text>
                 </Link>
                 <Icon as={BsDot} color="gray.500" fontSize={8} />
               </>
             )}
             <Text>
-              Posted by u/{decryptedData.creatorDisplayName}{" "}
+              Posted by u/{post.creatorDisplayName}{" "}
               {moment(new Date(post.createdAt?.seconds * 1000)).fromNow()}
             </Text>
           </Stack>
           <Text fontSize="12pt" fontWeight={600}>
-            {decryptedData.title}
+            {post.title}
           </Text>
-          <Text fontSize="10pt">{decryptedData.body}</Text>
+          <Text fontSize="10pt">{post.body}</Text>
           {post.imageURL && (
             <Flex justify="center" align="center" p={2}>
               {loadingImage && (
                 <Skeleton height="200px" width="100%" borderRadius={4} />
               )}
               <Image
-                src={decryptedData.imageURL}
+                src={post.imageURL}
                 maxHeight="460px"
                 alt="Post Image"
                 display={loadingImage ? "none" : "unset"}
@@ -229,49 +175,43 @@ const PostItem: React.FC<PostItemProps> = ({
             </Flex>
           )}
         </Stack>
-        <Flex ml={1} mb={0.5} color="gray.500" fontWeight={600}>
+        <Flex ml={1} mb={0.5} color="gray.500">
           <Flex
             align="center"
             p="8px 10px"
             borderRadius={4}
-            _hover={{ bg: IconHoverBg }}
+            _hover={{ bg: "gray.200" }}
             cursor="pointer"
           >
-            <Icon as={BsChat} mr={2} color={IconBg} />
-            <Text fontSize="9pt" color={IconBg}>
-              {post.numberOfComments}
-            </Text>
+            <Icon as={BsChat} mr={2} />
+            <Text fontSize="9pt">{post.numberOfComments}</Text>
           </Flex>
           <Flex
             align="center"
             p="8px 10px"
             borderRadius={4}
-            _hover={{ bg: IconHoverBg }}
+            _hover={{ bg: "gray.200" }}
             cursor="pointer"
           >
-            <Icon as={IoArrowRedoOutline} mr={2} color={IconBg} />
-            <Text fontSize="9pt" color={IconBg}>
-              Share
-            </Text>
+            <Icon as={IoArrowRedoOutline} mr={2} />
+            <Text fontSize="9pt">Share</Text>
           </Flex>
           <Flex
             align="center"
             p="8px 10px"
             borderRadius={4}
-            _hover={{ bg: IconHoverBg }}
+            _hover={{ bg: "gray.200" }}
             cursor="pointer"
           >
-            <Icon as={IoBookmarkOutline} mr={2} color={IconBg} />
-            <Text fontSize="9pt" color={IconBg}>
-              Save
-            </Text>
+            <Icon as={IoBookmarkOutline} mr={2} />
+            <Text fontSize="9pt">Save</Text>
           </Flex>
           {userIsCreator && (
             <Flex
               align="center"
               p="8px 10px"
               borderRadius={4}
-              _hover={{ bg: IconHoverBg }}
+              _hover={{ bg: "gray.200" }}
               cursor="pointer"
               onClick={handleDelete}
             >
@@ -279,10 +219,8 @@ const PostItem: React.FC<PostItemProps> = ({
                 <Spinner size="sm" />
               ) : (
                 <>
-                  <Icon as={AiOutlineDelete} mr={2} color={IconBg} />
-                  <Text fontSize="9pt" color={IconBg}>
-                    Delete
-                  </Text>
+                  <Icon as={AiOutlineDelete} mr={2} />
+                  <Text fontSize="9pt">Delete</Text>
                 </>
               )}
             </Flex>

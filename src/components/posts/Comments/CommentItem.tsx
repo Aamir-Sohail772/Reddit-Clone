@@ -1,26 +1,17 @@
-import {
-  Avatar,
-  Box,
-  Flex,
-  Icon,
-  Spinner,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
-import CryptoJS from "crypto-js";
+import { Box, Flex, Icon, Spinner, Stack, Text } from "@chakra-ui/react";
 import { Timestamp } from "firebase/firestore";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { FaReddit } from "react-icons/fa";
 import {
   IoArrowDownCircleOutline,
   IoArrowUpCircleOutline,
 } from "react-icons/io5";
 
 export type Comment = {
-  id?: string;
+  id: string;
   creatorId: string;
   creatorDisplayText: string;
-  creatorPhotoURL: string;
   communityId: string;
   postId: string;
   postTitle: string;
@@ -31,63 +22,30 @@ export type Comment = {
 type CommentItemProps = {
   comment: Comment;
   onDeleteComment: (comment: Comment) => void;
-  isLoading: boolean;
-  userId?: string;
+  loadingDelete: boolean;
+  userId: string;
 };
 
 const CommentItem: React.FC<CommentItemProps> = ({
   comment,
   onDeleteComment,
-  isLoading,
+  loadingDelete,
   userId,
 }) => {
-  const [decryptedData, setDecryptedData] = useState({
-    text: "",
-    creatorDisplayText: "",
-  });
-
-  useEffect(() => {
-    const arr = [comment.text, comment.creatorDisplayText];
-    const arrName = ["text", "creatorDisplayText"];
-
-    try {
-      for (let index = 0; index < arr.length; index++) {
-        if (arr[index]) {
-          const bytes = CryptoJS.AES.decrypt(
-            arr[index]!,
-            process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS as string
-          );
-          const data = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-
-          setDecryptedData((prev) => ({
-            ...prev,
-            [arrName[index]]: data,
-          }));
-        } else return;
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }, [comment]);
-
   return (
     <Flex>
       <Box mr={2}>
-        <Avatar
-          src={comment.creatorPhotoURL}
-          size="sm"
-          name={decryptedData.creatorDisplayText}
-        />
+        <Icon as={FaReddit} fontSize={30} color="gray.300" />
       </Box>
       <Stack spacing={1}>
-        <Stack direction="row" align="center" fontSize="8px">
-          <Text>{decryptedData.creatorDisplayText}</Text>
-          <Text>
-            {moment(new Date(comment.createdAt?.seconds * 1000)).fromNow()}
+        <Stack direction="row" align="center" fontSize="8pt">
+          <Text fontWeight={700}>{comment.creatorDisplayText}</Text>
+          <Text color="gray.600">
+            {moment(new Date(comment.createdAt.seconds * 1000)).fromNow()}
           </Text>
-          {isLoading && <Spinner size="sm" />}
+          {loadingDelete && <Spinner size="sm" />}
         </Stack>
-        <Text fontSize="10pt">{decryptedData.text}</Text>
+        <Text fontSize="10pt">{comment.text}</Text>
         <Stack direction="row" align="center" cursor="pointer" color="gray.500">
           <Icon as={IoArrowUpCircleOutline} />
           <Icon as={IoArrowDownCircleOutline} />

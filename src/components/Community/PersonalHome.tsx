@@ -1,35 +1,18 @@
-import {
-  Button,
-  Flex,
-  Icon,
-  Stack,
-  Text,
-  useColorModeValue,
-} from "@chakra-ui/react";
-import React, { useState } from "react";
+import React from "react";
+import { Button, Flex, Icon, Stack, Text } from "@chakra-ui/react";
 import { FaReddit } from "react-icons/fa";
 
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../../firebase/clientApp";
-import CreateCommunityModel from "../Modal/CreateCommunity/CreateCommunityModel";
-
 const PersonalHome: React.FC = () => {
-  const [user] = useAuthState(auth);
-  const [open, setOpen] = useState(false);
-  const bg = useColorModeValue("white", "#1A202C");
-  const borderColor = useColorModeValue("gray.300", "#2D3748");
-
   return (
     <Flex
       direction="column"
-      bg={bg}
+      bg="white"
       borderRadius={4}
       cursor="pointer"
       border="1px solid"
-      borderColor={borderColor}
+      borderColor="gray.300"
       position="sticky"
     >
-      <CreateCommunityModel open={open} handleClose={() => setOpen(false)} />
       <Flex
         align="flex-end"
         color="white"
@@ -38,7 +21,7 @@ const PersonalHome: React.FC = () => {
         height="34px"
         borderRadius="4px 4px 0px 0px"
         fontWeight={600}
-        bgImage="url(/images/sgf6r5easbh31.jpg)"
+        bgImage="url(/images/redditPersonalHome.png)"
         backgroundSize="cover"
       ></Flex>
       <Flex direction="column" p="12px">
@@ -51,14 +34,7 @@ const PersonalHome: React.FC = () => {
             Your personal Reddit frontpage, built for you.
           </Text>
           <Button height="30px">Create Post</Button>
-          <Button
-            disabled={!user}
-            variant="outline"
-            height="30px"
-            onClick={() => {
-              setOpen(true);
-            }}
-          >
+          <Button variant="outline" height="30px">
             Create Community
           </Button>
         </Stack>

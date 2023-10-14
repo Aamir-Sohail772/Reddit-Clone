@@ -1,13 +1,24 @@
 import {
   Alert,
+  AlertDescription,
   AlertIcon,
+  AlertTitle,
+  CloseButton,
   Flex,
   Icon,
   Text,
-  useColorModeValue,
 } from "@chakra-ui/react";
-import CryptoJS from "crypto-js";
+import React, { ReactEventHandler, useState } from "react";
+import { BiPoll } from "react-icons/bi";
+import { BsLink45Deg, BsMic } from "react-icons/bs";
+import { IoDocumentText, IoImageOutline } from "react-icons/io5";
+import { AiFillCloseCircle } from "react-icons/ai";
+import TabItem from "./TabItem";
+import TextInputs from "./PostForm/TextInputs";
+import ImageUpload from "./PostForm/ImageUpload";
+import { Post } from "../../atoms/postsAtom";
 import { User } from "firebase/auth";
+import { useRouter } from "next/router";
 import {
   addDoc,
   collection,
@@ -15,27 +26,16 @@ import {
   Timestamp,
   updateDoc,
 } from "firebase/firestore";
-import { getDownloadURL, ref, uploadString } from "firebase/storage";
-import { useRouter } from "next/router";
-import React, { useState } from "react";
-import { BiPoll } from "react-icons/bi";
-import { BsLink45Deg, BsMic } from "react-icons/bs";
-import { IoDocumentText, IoImageOutline } from "react-icons/io5";
-import { Post } from "../../atoms/PostAtom";
 import { firestore, storage } from "../../firebase/clientApp";
+import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import useSelectFile from "../../hooks/useSelectFile";
-import ImageUpload from "./postsForm/ImageUpload";
-import TextInput from "./postsForm/TextInput";
-import TabItems from "./TabItem";
-
-const secretPass = process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS;
 
 type NewPostFormProps = {
   user: User;
   communityImageURL?: string;
 };
 
-const formTabs = [
+const formTabs: TabItem[] = [
   {
     title: "Post",
     icon: IoDocumentText,
@@ -68,39 +68,26 @@ const NewPostForm: React.FC<NewPostFormProps> = ({
   communityImageURL,
 }) => {
   const router = useRouter();
-  const [selectedTab, setSelectTab] = useState(formTabs[0].title);
-  const [textInput, setTextInput] = useState({
+  const [selectedTab, setSelectedTab] = useState(formTabs[0].title);
+  const [textInputs, setTextInputs] = useState({
     title: "",
     body: "",
   });
-  const [encryptedData, setEncryptedData] = useState({
-    title: "",
-    body: "",
-  });
-  //const [selectedFile, setSelectedFile] = useState<string>();
-  const { selectedFile, setSelectedFile, onSelectedFile } = useSelectFile();
+  const { selectedFile, setSelectedFile, onSelectFile } = useSelectFile();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  const bg = useColorModeValue("white", "#1A202C");
 
   const handleCreatePost = async () => {
     const { communityId } = router.query;
-    // create new post
-
-    const splitName = user.email!.split("@")[0];
-
-    const dataName = CryptoJS.AES.encrypt(
-      JSON.stringify(splitName),
-      process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS as string
-    ).toString();
+    // create new post object => type Post
 
     const newPost: Post = {
       communityId: communityId as string,
-      creatorId: user.uid,
       communityImageURL: communityImageURL || "",
-      creatorDisplayName: dataName,
-      title: encryptedData.title,
-      body: encryptedData.body,
+      creatorId: user.uid,
+      creatorDisplayName: user.email!.split("@")[0],
+      title: textInputs.title,
+      body: textInputs.body,
       numberOfComments: 0,
       voteStatus: 0,
       createdAt: serverTimestamp() as Timestamp,
@@ -108,58 +95,28 @@ const NewPostForm: React.FC<NewPostFormProps> = ({
 
     setLoading(true);
     try {
+      // store the post in db
       const postDocRef = await addDoc(collection(firestore, "posts"), newPost);
 
+      // check for selectedFile
       if (selectedFile) {
+        // store in storage => getDownloadURL (return imageURL)
         const imageRef = ref(storage, `posts/${postDocRef.id}/image`);
         await uploadString(imageRef, selectedFile, "data_url");
         const downloadURL = await getDownloadURL(imageRef);
 
-        const encryptDownloadURL = CryptoJS.AES.encrypt(
-          JSON.stringify(downloadURL),
-          process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS as string
-        ).toString();
-
+        // update post doc by adding imageURL
         await updateDoc(postDocRef, {
-          imageURL: encryptDownloadURL,
+          imageURL: downloadURL,
         });
       }
+      // redirect the user back to the communityPage using the router
       router.back();
     } catch (error: any) {
-      console.log(error.message);
+      console.log("handleCreatePost error", error.message);
       setError(true);
     }
     setLoading(false);
-  };
-
-  const onSelectedImage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const reader = new FileReader();
-
-    if (event.target.files?.[0]) {
-      reader.readAsDataURL(event.target.files[0]);
-    }
-
-    reader.onload = (readerEvent) => {
-      if (readerEvent.target?.result) {
-        setSelectedFile(readerEvent.target.result as string);
-      }
-    };
-  };
-
-  const encryptData = (name: string, value: string) => {
-    try {
-      const data = CryptoJS.AES.encrypt(
-        JSON.stringify(value),
-        process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS as string
-      ).toString();
-
-      setEncryptedData((prev) => ({
-        ...prev,
-        [name]: data,
-      }));
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   const onTextChange = (
@@ -168,39 +125,38 @@ const NewPostForm: React.FC<NewPostFormProps> = ({
     const {
       target: { name, value },
     } = event;
-    encryptData(name, value);
-    setTextInput((prev) => ({
+    setTextInputs((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
   return (
-    <Flex direction="column" bg={bg} borderRadius={4} mt={2}>
+    <Flex direction="column" bg="white" borderRadius={4} mt={2}>
       <Flex width="100%">
         {formTabs.map((item) => (
-          <TabItems
+          <TabItem
             key={item.title}
             item={item}
             selected={item.title === selectedTab}
-            setSelectTab={setSelectTab}
+            setSelectedTab={setSelectedTab}
           />
         ))}
       </Flex>
       <Flex p={4}>
         {selectedTab === "Post" && (
-          <TextInput
-            textInputs={textInput}
-            onChange={onTextChange}
+          <TextInputs
+            textInputs={textInputs}
             handleCreatePost={handleCreatePost}
+            onChange={onTextChange}
             loading={loading}
           />
         )}
         {selectedTab === "Images & Video" && (
           <ImageUpload
             selectedFile={selectedFile}
-            onSelectedImage={onSelectedFile}
-            setSelectTab={setSelectTab}
+            onSelectImage={onSelectFile}
+            setSelectedTab={setSelectedTab}
             setSelectedFile={setSelectedFile}
           />
         )}
@@ -208,7 +164,7 @@ const NewPostForm: React.FC<NewPostFormProps> = ({
       {error && (
         <Alert status="error">
           <AlertIcon />
-          <Text mr={2}>Error Creating Post</Text>
+          <Text mr={2}>Error creating post</Text>
         </Alert>
       )}
     </Flex>

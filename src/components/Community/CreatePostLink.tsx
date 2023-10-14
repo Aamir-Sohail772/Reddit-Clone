@@ -1,4 +1,4 @@
-import { Flex, Icon, Input, useColorModeValue } from "@chakra-ui/react";
+import { Flex, Icon, Input } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import React from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -6,27 +6,21 @@ import { BsLink45Deg } from "react-icons/bs";
 import { FaReddit } from "react-icons/fa";
 import { IoImageOutline } from "react-icons/io5";
 import { useSetRecoilState } from "recoil";
-
-import { authModelState } from "../../atoms/authModalAtom";
+import { authModalState } from "../../atoms/authModalAtom";
 import { auth } from "../../firebase/clientApp";
 import useDirectory from "../../hooks/useDirectory";
 
 const CreatePostLink: React.FC = () => {
   const router = useRouter();
   const [user] = useAuthState(auth);
+  const setAuthModalState = useSetRecoilState(authModalState);
   const { toggleMenuOpen } = useDirectory();
-  const setAuthModelState = useSetRecoilState(authModelState);
-  const bg = useColorModeValue("white", "#1A202C");
-  const borderColor = useColorModeValue("gray.300", "#2D3748");
-  const searchBg = useColorModeValue("gray.50", "#2D3748");
-  const searchBorder = useColorModeValue("gray.200", "#4A5568");
 
   const onClick = () => {
     if (!user) {
-      setAuthModelState({ open: true, view: "login" });
+      setAuthModalState({ open: true, view: "login" });
       return;
     }
-
     const { communityId } = router.query;
 
     if (communityId) {
@@ -34,25 +28,19 @@ const CreatePostLink: React.FC = () => {
       return;
     }
 
+    // open our direcotry menu
     toggleMenuOpen();
-
-    /*
-    if (community) {
-      router.push(`/r/${router.query.community}/submit`);
-      return;
-    }
-    */
   };
 
   return (
     <Flex
       justify="space-evenly"
       align="center"
-      bg={bg}
+      bg="white"
       height="56px"
       borderRadius={4}
       border="1px solid"
-      borderColor={borderColor}
+      borderColor="gray.300"
       p={2}
       mb={4}
     >
@@ -62,18 +50,18 @@ const CreatePostLink: React.FC = () => {
         fontSize="10pt"
         _placeholder={{ color: "gray.500" }}
         _hover={{
-          bg: bg,
+          bg: "white",
           border: "1px solid",
           borderColor: "blue.500",
         }}
         _focus={{
           outline: "none",
-          bg: bg,
+          bg: "white",
           border: "1px solid",
           borderColor: "blue.500",
         }}
-        bg={searchBg}
-        borderColor={searchBorder}
+        bg="gray.50"
+        borderColor="gray.200"
         height="36px"
         borderRadius={4}
         mr={4}

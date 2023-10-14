@@ -3,7 +3,9 @@ import React, { useState } from "react";
 const useSelectFile = () => {
   const [selectedFile, setSelectedFile] = useState<string>();
 
-  const onSelectedFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onSelectFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("THIS IS HAPPENING", event);
+
     const reader = new FileReader();
 
     if (event.target.files?.[0]) {
@@ -17,6 +19,10 @@ const useSelectFile = () => {
     };
   };
 
-  return { selectedFile, setSelectedFile, onSelectedFile };
+  return {
+    selectedFile,
+    setSelectedFile,
+    onSelectFile,
+  };
 };
 export default useSelectFile;
