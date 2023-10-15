@@ -1,34 +1,41 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# [Reddit Clone](https://reddit-app-clone.netlify.app/)
 
-## Getting Started
+## Tech Stack used area React, Javascript, HTML, CSS
 
-First, run the development server:
+### This is Clone of Reddit App where the user can see the different posts and create Posts. (This is for educational purpose only)
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+#### Third party libraries used are as follows: -
+1. React-Redux for managing the central state.
+2. React Router for Routing to different pages.
+3. Material UI for designing the UI.
+4. axios for fetching the hotel data.
+5. Firebase for Google Authentication Sign in
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+#### Some snapshots of the App are
+1. ![REDDIT-1](https://github.com/abdurrahman6489/RedditClone/assets/120268868/94b5995c-bb96-4fba-b19b-bb684b8518d5)
+2. ![REDDIT-2](https://github.com/abdurrahman6489/RedditClone/assets/120268868/63f3b33d-8486-4b24-9f07-50427aa17d15)
+3. ![REDDIT-3](https://github.com/abdurrahman6489/RedditClone/assets/120268868/a5d76796-6134-4b9c-8926-957300c5d485)
+4. ![REDDIT-4](https://github.com/abdurrahman6489/RedditClone/assets/120268868/e860afe9-4ea6-4d67-aacf-cc2706796061)
+5. ![REDDIT-5](https://github.com/abdurrahman6489/RedditClone/assets/120268868/3a182679-9551-4149-ae7a-7068d77afbec)
+6. ![REDDIT-6](https://github.com/abdurrahman6489/RedditClone/assets/120268868/4f859f5d-4476-4740-8061-fd714bdb9a99)
+7. ![REDDIT-7](https://github.com/abdurrahman6489/RedditClone/assets/120268868/2e479e55-b136-4ba3-85aa-13be5dcf6cfe)
+8. ![REDDIT-8](https://github.com/abdurrahman6489/RedditClone/assets/120268868/d77625bc-1ecd-48c3-afdb-066d87425e63)
+9. ![REDDIT-9](https://github.com/abdurrahman6489/RedditClone/assets/120268868/af4c2f68-0622-4095-a8a8-0bf56e79821d)
+10. ![REDDIT-10](https://github.com/abdurrahman6489/RedditClone/assets/120268868/4c663044-c682-4f1d-94c6-cc90c307a5c0)
+11. ![REDDIT-11](https://github.com/abdurrahman6489/RedditClone/assets/120268868/2002a800-d938-42c3-9eab-cc42dab0b353)
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+#### The details of the app are as follows.
+1. At first the user is directed to the Hoome page with different posts. The Posts are sorted with tag Best, with highest upvote/downvote ratio.
+2. The user is redirected to login page first before voting, or reading or creating a post using either Google Authentication or by giving username and password there.
+3. If the user has not an account then he can sign up also.
+4. Then the user can raed posts, create posts or upvote or downvote a post.
+5. If the user clicks on any post, he is redirected to that post with showing title, image and description, the user can vote from there also. (Sharing or commenting a post is under process)
+6. The user can also create Post by clicking on Create Post on the top Navbar. That post is shown as the first post
+7. User can also logout from there. By doing so the App gets restored to its initial state.
+8. There are confirmation and warning messages showin to user using Popups to increase user's interaction with the App.
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
