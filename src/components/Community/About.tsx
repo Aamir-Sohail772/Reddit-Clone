@@ -22,7 +22,7 @@ import useSelectFile from "../../hooks/useSelectFile";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import { doc, updateDoc } from "firebase/firestore";
 import { useSetRecoilState } from "recoil";
-import { Community, CommunityState } from "../../atoms/communitiesAtom";
+import { Community, communityState } from "../../atoms/communitiesAtom";
 type AboutProps = {
   communityData: Community;
 };
@@ -65,7 +65,7 @@ const About: React.FC<AboutProps> = ({ communityData }) => {
         bg="blue.400"
         color="white"
         p={3}
-        borderRadius="4px 4px 0px 0px"
+        borderRadius="4px 4px 0px 0px" 
       >
         <Text fontSize="10pt" fontWeight={700}>
           About Community
