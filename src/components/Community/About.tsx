@@ -26,13 +26,12 @@ import { Community, CommunityState } from "../../atoms/communitiesAtom";
 type AboutProps = {
   communityData: Community;
 };
-
 const About: React.FC<AboutProps> = ({ communityData }) => {
   const [user] = useAuthState(auth);
   const selectedFileRef = useRef<HTMLInputElement>(null);
   const { selectedFile, setSelectedFile, onSelectFile } = useSelectFile();
   const [uploadingImage, setUploadingImage] = useState(false);
-  const setCommunityStateValue = useSetRecoilState(CommunityState);
+  const setCommunityStateValue = useSetRecoilState(communityState);
 
   const onUpdateImage = async () => {
     if (!selectedFile) return;
