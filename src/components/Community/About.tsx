@@ -22,9 +22,9 @@ import useSelectFile from "../../hooks/useSelectFile";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import { doc, updateDoc } from "firebase/firestore";
 import { useSetRecoilState } from "recoil";
-import { Community, communityState } from "../../atoms/communitiesAtom";
+import { community, communityState } from "../../atoms/communitiesAtom";
 type AboutProps = {
-  communityData: Community;
+  communityData: community;
 };
 const About: React.FC<AboutProps> = ({ communityData }) => {
   const [user] = useAuthState(auth);
@@ -49,7 +49,7 @@ const About: React.FC<AboutProps> = ({ communityData }) => {
         currentCommunity: {
           ...prev.currentCommunity,
           imageURL: downloadURL,
-        } as Community,
+        } as community,
       }));
     } catch (error) {
       console.log("onUpdateImage error", error);
